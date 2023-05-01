@@ -1,5 +1,7 @@
+import { SignUpData } from 'src/auth/adapter/auth.dto';
+
 export interface IAuthService {
-  getTest(): string;
+  signUp(SignUpData: SignUpData): Promise<{ token: string; userId: number }>;
 }
 
 export const IAuthService = Symbol('IAuthService');
