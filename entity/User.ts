@@ -9,8 +9,24 @@ export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', unsigned: true })
   id: number;
 
-  @Column('varchar', { name: 'username', nullable: false, length: 50 })
+  @Column('varchar', {
+    name: 'email',
+    nullable: false,
+    unique: true,
+    length: 100,
+  })
+  email: string;
+
+  @Column('varchar', {
+    name: 'username',
+    nullable: false,
+    unique: true,
+    length: 50,
+  })
   userName: string;
+
+  @Column('varchar')
+  password: string;
 
   @Column('timestamp', { name: 'created_at', default: () => "'now()'" })
   createdAt: Date;
