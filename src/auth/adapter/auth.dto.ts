@@ -10,6 +10,17 @@ export class SignUpData {
   readonly userName: string;
 
   @IsNotEmpty()
+  @IsString()
+  readonly password: string;
+}
+
+export class SignInData {
+  @IsNotEmpty()
+  @IsEmail()
+  readonly email: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly password: string;
 }
 
