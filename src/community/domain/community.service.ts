@@ -9,7 +9,7 @@ export class CommunityService implements ICommunityService {
     private communityRepository: ICommunityRepository,
   ) {}
 
-  getTest() {
-    return 'asdfasdf';
+  async getAllcategories() {
+    return this.communityRepository.getAllCategories();
   }
 }

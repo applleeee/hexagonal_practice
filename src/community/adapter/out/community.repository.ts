@@ -11,5 +11,7 @@ export class CommunityRepository implements ICommunityRepository {
     private subCategoryRepository: Repository<SubCategory>,
   ) {}
 
-  test() {}
+  async getAllCategories() {
+    return await this.subCategoryRepository.find();
+  }
 }

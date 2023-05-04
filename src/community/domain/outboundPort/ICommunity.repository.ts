@@ -1,5 +1,7 @@
+import { SubCategory } from 'entity/SubCategory';
+
 export interface ICommunityRepository {
-  test(): void;
+  getAllCategories(): Promise<SubCategory[]>;
 }
 
 export const ICommunityRepository = Symbol('ICommunityRepository');
