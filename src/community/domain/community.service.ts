@@ -12,4 +12,6 @@ export class CommunityService implements ICommunityService {
   async getAllcategories() {
     return this.communityRepository.getAllCategories();
   }
+
+  async saveImageToS3() {}
 }

@@ -31,5 +31,19 @@ export class Payload {
 
   @IsNotEmpty()
   @IsString()
-  readonly userName: string;
+  readonly userId: number;
+}
+
+export class AuthorizedUser {
+  readonly userId: number;
+
+  readonly email: string;
+
+  readonly idsOfPostsCreatedByUser: number[];
+
+  readonly idsOfPostLikedByUser: number[];
+
+  readonly idsOfCommentsCreatedByUser: number[];
+
+  readonly idsOfCommentLikedByUser: number[];
 }
