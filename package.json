@@ -20,12 +20,15 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.328.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/jwt": "^10.0.3",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
+    "aws-sdk": "^2.1373.0",
     "bcrypt": "^5.1.0",
+    "class-transformer": "^0.5.1",
     "dotenv": "^16.0.3",
     "mysql2": "^3.2.3",
     "passport-jwt": "^4.0.1",
