@@ -2,9 +2,13 @@ import { Post } from 'entity/Post';
 import { PostLike } from 'entity/PostLike';
 import { SubCategory } from 'entity/SubCategory';
 import {
+  CreateCommentDto,
+  CreateOrDeleteCommentLikesDto,
   DateEnum,
+  DeleteCommentDto,
   OptionEnum,
   SortEnum,
+  UpdateCommentDto,
 } from 'src/community/adapter/in/community.inputDto';
 import {
   PostDetail,
@@ -54,6 +58,22 @@ export interface ICommunityRepository {
     offset: number,
     limit: number,
   ): Promise<{ postLists: PostList[]; total: number }>;
+
+  getComments(postId: number);
+
+  getReComments(postId: number);
+
+  createComment(commentData: CreateCommentDto);
+
+  isCommentExist(commentId);
+
+  deleteComment(criteria);
+
+  deleteReComment(criteria: DeleteCommentDto);
+
+  updateComment(criteria: UpdateCommentDto, content: string);
+
+  createOrDeleteCommentLikes(criteria: CreateOrDeleteCommentLikesDto);
 }
 
 export const ICommunityRepository = Symbol('ICommunityRepository');

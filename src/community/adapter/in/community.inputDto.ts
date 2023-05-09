@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
 } from 'class-validator';
+import { AuthorizedUser } from 'src/auth/adapter/auth.dto';
 
 export enum SortEnum {
   latest = 'latest',
@@ -24,6 +25,11 @@ export enum OptionEnum {
   title = 'title',
   author = 'author',
   title_author = 'title_author',
+}
+
+export enum Depth {
+  COMMENT = 1,
+  RE_COMMENT,
 }
 
 export class GetPostListDto {
@@ -90,4 +96,62 @@ export class SearchPostDto {
   @IsNumber()
   @Type(() => Number)
   readonly limit: number;
+}
+
+export class CreateCommentBodyDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly content: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly groupOrder: number;
+
+  @IsEnum(Depth)
+  @IsNotEmpty()
+  readonly depth: Depth;
+}
+
+export class CreateCommentDto extends CreateCommentBodyDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly postId: number;
+}
+
+export class UpdateCommentDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly user: AuthorizedUser;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly id: number;
+}
+
+export class DeleteCommentDto extends UpdateCommentDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly groupOrder: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly postId: number;
+
+  @IsEnum(Depth)
+  @IsNotEmpty()
+  readonly depth: Depth;
+}
+
+export class CreateOrDeleteCommentLikesDto {
+  @IsNumber()
+  @IsNotEmpty()
+  readonly userId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  readonly commentId: number;
 }

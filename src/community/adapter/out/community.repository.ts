@@ -10,9 +10,19 @@ import {
   SelectQueryBuilder,
   UpdateResult,
 } from 'typeorm';
-import { DateEnum, OptionEnum, SortEnum } from '../in/community.inputDto';
+import {
+  CreateCommentDto,
+  CreateOrDeleteCommentLikesDto,
+  DateEnum,
+  DeleteCommentDto,
+  OptionEnum,
+  SortEnum,
+  UpdateCommentDto,
+} from '../in/community.inputDto';
 import { PostDetail, PostList } from './community.outputDto';
 import { PostLike } from 'entity/PostLike';
+import { Comment } from 'entity/Comment';
+import { CommentLike } from 'entity/CommentLike';
 
 @Injectable()
 export class CommunityRepository implements ICommunityRepository {
@@ -23,6 +33,10 @@ export class CommunityRepository implements ICommunityRepository {
     private postRepository: Repository<Post>,
     @InjectRepository(PostLike)
     private postLikeRepository: Repository<PostLike>,
+    @InjectRepository(Comment)
+    private commentRepository: Repository<Comment>,
+    @InjectRepository(CommentLike)
+    private commentLikeRepository: Repository<CommentLike>,
   ) {}
 
   private postList(offset?: number, limit?: number): SelectQueryBuilder<Post> {
@@ -222,5 +236,99 @@ export class CommunityRepository implements ICommunityRepository {
     const data = await queryBuilder.getRawMany();
     const total = await queryBuilder.getCount();
     return { postLists: data, total: total };
+  }
+
+  async getComments(postId: number) {
+    return await this.commentRepository
+      .createQueryBuilder('comment')
+      .select([
+        'comment.user_id as userId',
+        'comment.group_order as groupOrder',
+        'comment.id as commentId',
+        'user.userName as userName',
+        'comment.content as content',
+        'comment.depth as depth',
+        `DATE_FORMAT(comment.created_at, '%Y-%m-%d %H:%i:%s') as createdAt`,
+        `DATE_FORMAT(comment.updated_at, '%Y-%m-%d %H:%i:%s') as updatedAt`,
+      ])
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT(comment_like.id)', 'likeNumber')
+          .from(CommentLike, 'comment_like')
+          .where('comment.id = comment_like.comment_id');
+      }, 'likeNumber')
+      .leftJoin('user', 'user', 'comment.user_id = user.id')
+      .where('comment.post_id = :postId AND comment.depth = 1', {
+        postId: postId,
+      })
+      .orderBy('comment.group_order', 'ASC')
+      .addOrderBy('comment.created_at', 'ASC')
+      .getRawMany();
+  }
+
+  async getReComments(postId: number) {
+    return await this.commentRepository
+      .createQueryBuilder('comment')
+      .select([
+        'comment.user_id as userId',
+        'comment.group_order as groupOrder',
+        'comment.id as commentId',
+        'user.userName as userName',
+        'comment.content as content',
+        'comment.depth as depth',
+        `DATE_FORMAT(comment.created_at, '%Y-%m-%d %H:%i:%s') as createdAt`,
+        `DATE_FORMAT(comment.updated_at, '%Y-%m-%d %H:%i:%s') as updatedAt`,
+      ])
+      .addSelect((subQuery) => {
+        return subQuery
+          .select('COUNT(comment_like.id)', 'likeNumber')
+          .from(CommentLike, 'comment_like')
+          .where('comment.id = comment_like.comment_id');
+      }, 'likeNumber')
+      .leftJoin('user', 'user', 'comment.user_id = user.id')
+      .where('comment.post_id = :postId AND comment.depth = 2', {
+        postId: postId,
+      })
+      .orderBy('comment.group_order', 'ASC')
+      .addOrderBy('comment.created_at', 'ASC')
+      .getRawMany();
+  }
+
+  async createComment(commentData: CreateCommentDto) {
+    const data = this.commentRepository.create(commentData);
+    return await this.commentRepository.save(data);
+  }
+
+  async isCommentExist(commentId: number) {
+    return await this.commentRepository.exist({ where: { id: commentId } });
+  }
+
+  async deleteComment(criteria) {
+    return await this.commentRepository.delete(criteria);
+  }
+
+  async deleteReComment(criteria: DeleteCommentDto) {
+    return await this.commentRepository.delete(criteria);
+  }
+
+  async updateComment(criteria: UpdateCommentDto, content: string) {
+    return await this.commentRepository
+      .createQueryBuilder()
+      .update(Comment)
+      .set({
+        content: content,
+      })
+      .where(`id = ${criteria.id} AND user_id = ${criteria.user.userId}`)
+      .execute();
+  }
+
+  async createOrDeleteCommentLikes(criteria: CreateOrDeleteCommentLikesDto) {
+    const isExist = await this.commentLikeRepository.exist({
+      where: { ...criteria },
+    });
+
+    if (!isExist) return await this.commentLikeRepository.save(criteria);
+
+    return await this.commentLikeRepository.delete(criteria);
   }
 }

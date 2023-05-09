@@ -20,11 +20,16 @@ import { ICommunityService } from 'src/community/domain/inboundPort/ICommunity.s
 import { UserRequest } from '../community.interface';
 import { JwtAuthGuard, OptionalAuthGuard } from 'src/auth/jwt.guard';
 import {
+  CreateCommentBodyDto,
+  CreateCommentDto,
+  CreateOrDeleteCommentLikesDto,
   CreatePostDto,
+  DeleteCommentDto,
   DeleteImageDto,
   GetPostListDto,
   PostLikeDto,
   SearchPostDto,
+  UpdateCommentDto,
 } from './community.inputDto';
 import { SubCategory } from 'entity/SubCategory';
 import { DeleteObjectCommandOutput } from '@aws-sdk/client-s3';
@@ -204,5 +209,75 @@ export class CommunityController {
       offset,
       limit,
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/posts/:post_id/comment')
+  async createComment(
+    @Body() body: CreateCommentBodyDto,
+    @Req() req: UserRequest,
+    @Param('post_id') postId: number,
+  ) {
+    const user = req.user;
+    const commentData: CreateCommentDto = {
+      userId: user.userId,
+      postId,
+      ...body,
+    };
+    return await this.communityService.createComment(user, commentData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/comments/:comment_id')
+  async deleteComment(
+    @Req() req,
+    @Param('comment_id') commentId: number,
+    @Body() body,
+  ) {
+    const criteria: DeleteCommentDto = {
+      user: req.user,
+      id: commentId,
+      groupOrder: body.groupOrder,
+      depth: body.depth,
+      postId: body.postId,
+    };
+
+    return await this.communityService.deleteComment(criteria);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/comments/:comment_id')
+  async updateComment(
+    @Req() req,
+    @Param('comment_id') commentId: number,
+    @Body() body,
+  ) {
+    const content: string = body.content;
+    const criteria: UpdateCommentDto = {
+      user: req.user,
+      id: commentId,
+    };
+    return await this.communityService.updateComment(criteria, content);
+  }
+
+  @UseGuards(OptionalAuthGuard)
+  @Get('/posts/:post_id/comments')
+  async getComments(@Req() req, @Param('post_id') postId: number) {
+    const user = req.user;
+    return await this.communityService.getComments(user, postId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/comments/:comment_id/likes')
+  async createOrDeleteCommentLikes(
+    @Req() req,
+    @Param('comment_id') commentId: number,
+  ) {
+    const criteria: CreateOrDeleteCommentLikesDto = {
+      userId: req.user.id,
+      commentId,
+    };
+
+    return await this.communityService.createOrDeleteCommentLikes(criteria);
   }
 }

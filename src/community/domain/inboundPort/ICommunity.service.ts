@@ -1,10 +1,15 @@
 import { DeleteObjectsCommandOutput } from '@aws-sdk/client-s3';
 import { PostLike } from 'entity/PostLike';
 import { SubCategory } from 'entity/SubCategory';
+import { AuthorizedUser } from 'src/auth/adapter/auth.dto';
 import {
+  CreateCommentDto,
+  CreateOrDeleteCommentLikesDto,
   DateEnum,
+  DeleteCommentDto,
   OptionEnum,
   SortEnum,
+  UpdateCommentDto,
 } from 'src/community/adapter/in/community.inputDto';
 import {
   PostDetail,
@@ -59,6 +64,16 @@ export interface ICommunityService {
     offset: number,
     limit: number,
   ): Promise<{ postLists: PostList[]; total: number }>;
+
+  createComment(user: AuthorizedUser, commentData: CreateCommentDto);
+
+  deleteComment(criteria: DeleteCommentDto);
+
+  updateComment(criteria: UpdateCommentDto, content: string);
+
+  getComments(user, postId: number);
+
+  createOrDeleteCommentLikes(criteria: CreateOrDeleteCommentLikesDto);
 }
 
 export const ICommunityService = Symbol('ICommunityService');
