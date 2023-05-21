@@ -11,7 +11,7 @@ export class SignUpData {
 
   @IsNotEmpty()
   @IsString()
-  readonly password: string;
+  password: string;
 }
 
 export class SignInData {
