@@ -8,6 +8,8 @@ import { Comment } from 'entity/Comment';
 import { PostLike } from 'entity/PostLike';
 import { CommentLike } from 'entity/CommentLike';
 
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class AuthService implements IAuthService {
   constructor(
@@ -18,6 +20,8 @@ export class AuthService implements IAuthService {
 
   async signUp(signUpData: SignUpData): Promise<{ token: string }> {
     const { email } = signUpData;
+
+    signUpData.password = await bcrypt.hash(signUpData.password, 5);
     const user = await this.authRepository.createUser(signUpData);
 
     const payload = { email, userId: user.id };
@@ -35,8 +39,9 @@ export class AuthService implements IAuthService {
   async signIn(signInData: SignInData): Promise<{ token: string }> {
     const { email, password } = signInData;
     const user = await this.authRepository.getUserByEmail(email);
+    const isVaildPassword = await bcrypt.compare(password, user.password);
 
-    if (user.password === password) {
+    if (isVaildPassword) {
       const payload = { email, userId: user.id };
       const jwt = await this.getJwtAccessToken(payload);
       return { token: jwt };

@@ -17,7 +17,7 @@ const config: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD_LOCAL,
   database: process.env.DB_DATABASE_LOCAL,
   synchronize: true,
-  logging: true,
+  logging: false,
   charset: 'utf8mb4',
   extra: {
     charset: 'utf8mb4_general_ci',
