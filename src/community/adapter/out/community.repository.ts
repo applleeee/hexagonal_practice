@@ -129,12 +129,14 @@ export class CommunityRepository implements ICommunityRepository {
     //   subCategoryId: subCategoryId,
     // });
 
-    queryBuilderForCount.where('post.subCategoryId = :subCategoryId', {
-      subCategoryId: subCategoryId,
-    });
-    queryBuilderForData.where('post.subCategoryId = :subCategoryId', {
-      subCategoryId: subCategoryId,
-    });
+    if (subCategoryId !== 1) {
+      queryBuilderForCount.where('post.subCategoryId = :subCategoryId', {
+        subCategoryId: subCategoryId,
+      });
+      queryBuilderForData.where('post.subCategoryId = :subCategoryId', {
+        subCategoryId: subCategoryId,
+      });
+    }
 
     if (sort === 'latest') {
       queryBuilderForData.orderBy('post.created_at', 'DESC');
