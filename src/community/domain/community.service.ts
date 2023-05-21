@@ -95,8 +95,8 @@ export class CommunityService implements ICommunityService {
     try {
       await this.communityRepository.createPost(
         title,
-        userId,
         subCategoryId,
+        userId,
         contentUrl,
       );
     } catch (err) {
